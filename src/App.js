@@ -10,7 +10,6 @@ function App() {
 
     if (userDataParam) {
       try {
-        // Decode and parse the userData
         const decoded = JSON.parse(decodeURIComponent(userDataParam));
         setUserData(decoded);
 
@@ -82,27 +81,6 @@ function App() {
               {new Date(userData.timestamp).toLocaleString()}
             </p>
           </div>
-
-          <button
-            style={{
-              marginTop: "20px",
-              padding: "10px 15px",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-            onClick={() =>
-              sendDataToApp({
-                type: "USER_ACTION",
-                message: "User acknowledged data receipt",
-                timestamp: Date.now(),
-              })
-            }
-          >
-            Confirm Data Receipt
-          </button>
         </div>
       )}
 
