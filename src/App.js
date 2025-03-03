@@ -1,56 +1,35 @@
 import React, { useEffect, useState } from "react";
 
-const App = () => {
-  const [data, setData] = useState(null);
-  const [userIp, setUserIp] = useState("");
+function App() {
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const getUserIP = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+
+    if (token) {
       try {
-        // Fetch public IP (Alternative: 'https://api.ipify.org?format=json')
-        const ipResponse = await fetch("https://api64.ipify.org?format=json");
-        const ipData = await ipResponse.json();
-        setUserIp(ipData.ip); // Set the user's IP
-
-        console.log("User IP:", ipData.ip);
-
-        // Now fetch device info using the IP
-        fetchData(ipData.ip);
-      } catch (error) {
-        console.error("Error fetching IP:", error);
+        const decoded = JSON.parse(atob(token.split(".")[1]));
+        setUserData(decoded);
+      } catch (err) {
+        console.error("Error decoding token:", err);
       }
-    };
-
-    const fetchData = async (ip) => {
-      try {
-        const response = await fetch(`http://${ip}:8089/device-info`);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        setData(result);
-
-        alert("Data fetched successfully!");
-        console.log("Data:", result);
-      } catch (error) {
-        console.error("Fetch error:", error);
-        alert(`Error: ${error}`);
-      }
-    };
-
-    getUserIP();
+    }
   }, []);
 
   return (
     <div>
-      <h1>Fetching Device Info</h1>
-      <p>Detected IP: {userIp || "Fetching..."}</p>
-      <p>Check the console for results.</p>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+      {userData && (
+        <div>
+          <h2>User Data:</h2>
+          <p>Unique ID: {userData.uniqueId}</p>
+          <p>Device Unique ID: {userData.deviceUniqueId}</p>
+          <p>Timestamp: {new Date(userData.timestamp).toLocaleString()}</p>
+        </div>
+      )}
+      {!userData && <p>Waiting for data...</p>}
     </div>
   );
-};
+}
 
 export default App;
